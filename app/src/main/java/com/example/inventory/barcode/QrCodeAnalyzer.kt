@@ -7,6 +7,7 @@ import android.graphics.RectF
 import android.widget.Toast
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
+import com.example.inventory.data.ScannedBarcodes
 import com.google.mlkit.vision.barcode.BarcodeScannerOptions
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.common.InputImage
@@ -16,8 +17,12 @@ class QrCodeAnalyzer(
     private val context: Context,
     private val barcodeBoxView: BarcodeBoxView,
     private val previewViewWidth: Float,
-    private val previewViewHeight: Float
-) : ImageAnalysis.Analyzer {
+    private val previewViewHeight: Float,
+    private val scannedBarcode: ScannedBarcodes,
+
+
+    ) : ImageAnalysis.Analyzer {
+
 
     /**
      * This parameters will handle preview box scaling
@@ -55,7 +60,8 @@ class QrCodeAnalyzer(
                 .addOnSuccessListener { barcodes ->
                     if (barcodes.isNotEmpty()) {
                         for (barcode in barcodes) {
-                            // Handle received barcodes...
+                            scannedBarcode.setBarcode(barcode?.rawValue.toString())
+
                             Toast.makeText(
                                 context,
                                 "Value: " + barcode.rawValue,

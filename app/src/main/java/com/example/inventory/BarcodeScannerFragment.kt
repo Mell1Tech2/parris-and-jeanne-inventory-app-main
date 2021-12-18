@@ -2,17 +2,14 @@ package com.example.inventory
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.content.pm.PackageManager
-import android.content.pm.PackageManager.*
+import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.os.Bundle
-import android.os.Handler
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.Button
-import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.Preview
@@ -20,73 +17,68 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.PermissionChecker
-import androidx.core.content.PermissionChecker.checkSelfPermission
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import com.example.inventory.barcode.QrCodeAnalyzer
+import com.example.inventory.data.ScannedBarcodes
 import com.example.inventory.databinding.FragmentBarcodeScannerBinding
 import com.example.inventory.view.BarcodeBoxView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
-/**
- * An example full-screen fragment that shows and hides the system UI (i.e.
- * status bar and navigation/system bar) with user interaction.
- */
 class BarcodeScannerFragment : Fragment() {
-    private val hideHandler = Handler()
 
+    private val scannedBarcode: ScannedBarcodes by activityViewModels()
 
     private val showPart2Runnable = Runnable {
         // Delayed display of UI elements
         fullscreenContentControls?.visibility = View.VISIBLE
     }
     private var visible: Boolean = false
-    private val hideRunnable = Runnable { hide() }
 
     /**
      * Touch listener to use for in-layout UI controls to delay hiding the
      * system UI. This is to prevent the jarring behavior of controls going away
      * while interacting with activity UI.
      */
+    @SuppressLint("ClickableViewAccessibility")
     private val delayHideTouchListener = View.OnTouchListener { _, _ ->
-
         false
     }
 
     private lateinit var cameraExecutor: ExecutorService
     private lateinit var barcodeBoxView: BarcodeBoxView
+
+
     private var dummyButton: Button? = null
     private var fullscreenContent: View? = null
     private var fullscreenContentControls: View? = null
 
     private var _binding: FragmentBarcodeScannerBinding? = null
-
-    // This property is only valid between onCreateView and
-    // onDestroyView.
     private val binding get() = _binding!!
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = FragmentBarcodeScannerBinding.inflate(inflater, container, false)
         return binding.root
-
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        Log.d("Log", "Barcode view created")
         visible = true
+
 
         dummyButton = binding.dummyButton
         fullscreenContent = binding.fullscreenContent
         fullscreenContentControls = binding.fullscreenContentControls
         // Set up the user interaction to manually show or hide the system UI.
-        fullscreenContent?.setOnClickListener { toggle() }
+
 
         // Upon interacting with UI controls, delay any scheduled hide()
         // operations to prevent the jarring behavior of controls going away
@@ -102,20 +94,11 @@ class BarcodeScannerFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         activity?.window?.addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
-
-        // Trigger the initial hide() shortly after the activity has been
-        // created, to briefly hint to the user that UI controls
-        // are available.
-        delayedHide(100)
     }
 
     override fun onPause() {
         super.onPause()
         activity?.window?.clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
-
-        // Clear the systemUiVisibility flag
-        activity?.window?.decorView?.systemUiVisibility = 0
-        show()
     }
 
     override fun onDestroy() {
@@ -123,42 +106,6 @@ class BarcodeScannerFragment : Fragment() {
         dummyButton = null
         fullscreenContent = null
         fullscreenContentControls = null
-    }
-
-    private fun toggle() {
-        if (visible) {
-            hide()
-        } else {
-            show()
-        }
-    }
-
-    private fun hide() {
-        // Hide UI first
-        fullscreenContentControls?.visibility = View.GONE
-        visible = false
-
-        // Schedule a runnable to remove the status and navigation bar after a delay
-        hideHandler.removeCallbacks(showPart2Runnable)
-    }
-
-    @Suppress("InlinedApi")
-    private fun show() {
-        // Show the system bar
-        fullscreenContent?.systemUiVisibility =
-            View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or
-                    View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-        visible = true
-
-    }
-
-    /**
-     * Schedules a call to hide() in [delayMillis], canceling any
-     * previously scheduled calls.
-     */
-    private fun delayedHide(delayMillis: Int) {
-        hideHandler.removeCallbacks(hideRunnable)
-        hideHandler.postDelayed(hideRunnable, delayMillis.toLong())
     }
 
     companion object {
@@ -198,16 +145,14 @@ class BarcodeScannerFragment : Fragment() {
     /**
      * This function is responsible to request the required CAMERA permission
      */
-    private fun checkCameraPermission() {
-        try {
-            Log.d("Log", "Checking for camera permission")
-            val requiredPermissions = arrayOf(Manifest.permission.CAMERA)
-            activity?.let { ActivityCompat.requestPermissions(it, requiredPermissions, 0) };
-            Log.d("Log", "Camera permission ranted")
-            startCamera()
-        } catch (e: IllegalArgumentException) {
-            checkIfCameraPermissionIsGranted()
-        }
+    private fun checkCameraPermission() = try {
+        Log.d("Log", "Checking for camera permission")
+        val requiredPermissions = arrayOf(Manifest.permission.CAMERA)
+        activity?.let { ActivityCompat.requestPermissions(it, requiredPermissions, 0) }
+        Log.d("Log", "Camera permission granted")
+        startCamera()
+    } catch (e: IllegalArgumentException) {
+        checkIfCameraPermissionIsGranted()
     }
 
     /**
@@ -219,8 +164,8 @@ class BarcodeScannerFragment : Fragment() {
     private fun checkIfCameraPermissionIsGranted() {
         if (PermissionChecker.checkSelfPermission(this.requireContext(), Manifest.permission.CAMERA) == PERMISSION_GRANTED) {
             // Permission granted: start the preview
+            Log.d("Log", "Camera permission granted")
             startCamera()
-            Log.d("Log", "message")
         } else {
             // Permission denied
             MaterialAlertDialogBuilder(this.requireContext())
@@ -243,8 +188,8 @@ class BarcodeScannerFragment : Fragment() {
      * This function is responsible for the setup of the camera preview and the image analyzer.
      */
     private fun startCamera() {
-
         val cameraProviderFuture = ProcessCameraProvider.getInstance(this.requireContext())
+
         Log.d("Log", "Camera started")
         cameraProviderFuture.addListener({
             val cameraProvider = cameraProviderFuture.get()
@@ -265,7 +210,8 @@ class BarcodeScannerFragment : Fragment() {
                             this.requireContext(),
                             barcodeBoxView,
                             binding.previewView.width.toFloat(),
-                            binding.previewView.height.toFloat()
+                            binding.previewView.height.toFloat(),
+                            scannedBarcode
                         )
                     )
                 }

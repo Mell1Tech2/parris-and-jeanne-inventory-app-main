@@ -48,5 +48,4 @@ interface ItemDao {
     @Delete
     suspend fun delete(item: Item)
 
-
 }

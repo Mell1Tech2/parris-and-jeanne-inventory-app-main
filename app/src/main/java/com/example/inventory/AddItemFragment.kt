@@ -27,6 +27,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.example.inventory.data.Item
+import com.example.inventory.data.ScannedBarcodes
 import com.example.inventory.databinding.FragmentAddItemBinding
 
 /**
@@ -34,15 +35,15 @@ import com.example.inventory.databinding.FragmentAddItemBinding
  */
 class AddItemFragment : Fragment() {
 
-    // Use the 'by activityViewModels()' Kotlin property delegate from the fragment-ktx artifact
-    // to share the ViewModel across fragments.
     private val viewModel: InventoryViewModel by activityViewModels {
         InventoryViewModelFactory(
             (activity?.application as InventoryApplication).database
                 .itemDao()
         )
     }
+
     private val navigationArgs: ItemDetailFragmentArgs by navArgs()
+    private val scannedBarcode: ScannedBarcodes by activityViewModels()
 
     lateinit var item: Item
 
@@ -66,7 +67,8 @@ class AddItemFragment : Fragment() {
      */
     private fun isEntryValid(): Boolean {
         return viewModel.isEntryValid(
-            binding.itemName.text.toString(),
+            binding.itemBarcode.text.toString(),
+            binding.itemNameAdd.text.toString(),
             binding.itemPrice.text.toString(),
             binding.itemCount.text.toString(),
         )
@@ -78,7 +80,7 @@ class AddItemFragment : Fragment() {
     private fun bind(item: Item) {
         val price = "%.2f".format(item.itemPrice)
         binding.apply {
-            itemName.setText(item.itemName, TextView.BufferType.SPANNABLE)
+            itemNameAdd.setText(item.itemName, TextView.BufferType.SPANNABLE)
             itemPrice.setText(price, TextView.BufferType.SPANNABLE)
             itemCount.setText(item.quantityInStock.toString(), TextView.BufferType.SPANNABLE)
             saveAction.setOnClickListener { updateItem() }
@@ -91,7 +93,8 @@ class AddItemFragment : Fragment() {
     private fun addNewItem() {
         if (isEntryValid()) {
             viewModel.addNewItem(
-                binding.itemName.text.toString(),
+                binding.itemBarcode.text.toString(),
+                binding.itemNameAdd.text.toString(),
                 binding.itemPrice.text.toString(),
                 binding.itemCount.text.toString(),
             )
@@ -112,7 +115,8 @@ class AddItemFragment : Fragment() {
         if (isEntryValid()) {
             viewModel.updateItem(
                 this.navigationArgs.itemId,
-                this.binding.itemName.text.toString(),
+                this.binding.itemBarcode.text.toString(),
+                this.binding.itemNameAdd.text.toString(),
                 this.binding.itemPrice.text.toString(),
                 this.binding.itemCount.text.toString()
             )
@@ -131,6 +135,11 @@ class AddItemFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val id = navigationArgs.itemId
+
+        scannedBarcode.getBarcode().observe(viewLifecycleOwner, { barcode ->
+            binding.itemBarcode.setText(barcode.toString())
+        })
+
         if (id > 0) {
             viewModel.retrieveItem(id).observe(this.viewLifecycleOwner) { selectedItem ->
                 item = selectedItem

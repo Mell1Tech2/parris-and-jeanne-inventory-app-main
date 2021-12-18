@@ -1,18 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><!--
-  ~ Copyright (C) 2021 The Android Open Source Project.
-  ~
-  ~ Licensed under the Apache License, Version 2.0 (the "License");
-  ~ you may not use this file except in compliance with the License.
-  ~ You may obtain a copy of the License at
-  ~
-  ~     http://www.apache.org/licenses/LICENSE-2.0
-  ~
-  ~ Unless required by applicable law or agreed to in writing, software
-  ~ distributed under the License is distributed on an "AS IS" BASIS,
-  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  ~ See the License for the specific language governing permissions and
-  ~ limitations under the License.
-  -->
+<?xml version="1.0" encoding="utf-8"?>
 
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -31,21 +17,21 @@
             android:layout_height="match_parent"
             android:layout_marginBottom="16dp"
             android:orientation="horizontal"
-            app:layout_constraintBottom_toTopOf="@id/item_price_label"
+            app:layout_constraintBottom_toTopOf="@id/item_name_label"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/item_name_label"
+                android:id="@+id/item_barcode_label"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:hint="@string/item_name_req"
+                android:hint="@string/item_barcode_req"
                 android:orientation="horizontal">
 
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/item_name"
+                    android:id="@+id/item_barcode"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:inputType="textAutoComplete|textCapWords"
@@ -58,9 +44,29 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="2"
-                android:text="Scan" />
+                android:text="@string/scan" />
 
         </LinearLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/item_name_label"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin"
+            android:hint="@string/item_name_req"
+            app:layout_constraintBottom_toTopOf="@id/item_price_label"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/linearLayout">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/item_name_add"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:inputType="textAutoComplete|textCapWords"
+                android:singleLine="true" />
+
+        </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/item_price_label"
@@ -68,10 +74,10 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/margin"
             android:hint="@string/item_price_req"
-            app:layout_constraintBottom_toTopOf="@id/linearLayout"
+            app:layout_constraintBottom_toTopOf="@id/item_count_label"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/item_count_label"
+            app:layout_constraintTop_toBottomOf="@id/item_name_label"
             app:prefixText="@string/currency_symbol">
 
             <com.google.android.material.textfield.TextInputEditText

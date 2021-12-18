@@ -27,8 +27,10 @@ import java.text.NumberFormat
 data class Item(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
+    @ColumnInfo(name = "barcode")
+    var itemBarcode: String,
     @ColumnInfo(name = "name")
-    val itemName: String,
+    var itemName: String,
     @ColumnInfo(name = "price")
     val itemPrice: Double,
     @ColumnInfo(name = "quantity")
