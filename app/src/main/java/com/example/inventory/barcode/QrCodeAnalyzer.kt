@@ -1,12 +1,18 @@
 package com.example.inventory.barcode
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
 import android.graphics.Rect
 import android.graphics.RectF
-import android.widget.Toast
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
+import androidx.fragment.app.FragmentActivity
+import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
+import com.example.inventory.AddItemFragment
+import com.example.inventory.AddItemFragmentDirections
+import com.example.inventory.BarcodeScannerFragment
 import com.example.inventory.data.ScannedBarcodes
 import com.google.mlkit.vision.barcode.BarcodeScannerOptions
 import com.google.mlkit.vision.barcode.BarcodeScanning
@@ -14,19 +20,15 @@ import com.google.mlkit.vision.common.InputImage
 import com.example.inventory.view.BarcodeBoxView
 
 class QrCodeAnalyzer(
-    private val context: Context,
+    private val activity: Activity,
     private val barcodeBoxView: BarcodeBoxView,
     private val previewViewWidth: Float,
     private val previewViewHeight: Float,
     private val scannedBarcode: ScannedBarcodes,
 
-
     ) : ImageAnalysis.Analyzer {
 
-
-    /**
-     * This parameters will handle preview box scaling
-     */
+    // This parameters will handle preview box scaling
     private var scaleX = 1f
     private var scaleY = 1f
 
@@ -62,7 +64,10 @@ class QrCodeAnalyzer(
                         for (barcode in barcodes) {
                             scannedBarcode.setBarcode(barcode?.rawValue.toString())
 
-                            Toast.makeText(
+                            activity.onBackPressed()
+                            //barcodeBoxView.setRect(RectF())
+                            //image.close()
+                        /*    Toast.makeText(
                                 context,
                                 "Value: " + barcode.rawValue,
                                 Toast.LENGTH_SHORT
@@ -75,7 +80,7 @@ class QrCodeAnalyzer(
                                         rect
                                     )
                                 )
-                            }
+                            }*/
                         }
                     } else {
                         // Remove bounding rect

@@ -21,6 +21,6 @@
     <string name="edit_item">Edit Item</string>
     <string name="add_new_item">Add new item</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
-    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_button">Back</string>
     <string name="scan">Scan</string>
 </resources>

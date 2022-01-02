@@ -19,6 +19,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.PermissionChecker
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.findNavController
 import com.example.inventory.barcode.QrCodeAnalyzer
 import com.example.inventory.data.ScannedBarcodes
 import com.example.inventory.databinding.FragmentBarcodeScannerBinding
@@ -67,29 +68,7 @@ class BarcodeScannerFragment : Fragment() {
         return binding.root
     }
 
-    @SuppressLint("ClickableViewAccessibility")
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
 
-        visible = true
-
-
-        dummyButton = binding.dummyButton
-        fullscreenContent = binding.fullscreenContent
-        fullscreenContentControls = binding.fullscreenContentControls
-        // Set up the user interaction to manually show or hide the system UI.
-
-
-        // Upon interacting with UI controls, delay any scheduled hide()
-        // operations to prevent the jarring behavior of controls going away
-        // while interacting with the UI.
-        dummyButton?.setOnTouchListener(delayHideTouchListener)
-        cameraExecutor = Executors.newSingleThreadExecutor()
-
-        barcodeBoxView = BarcodeBoxView(this.requireContext())
-
-        checkCameraPermission()
-    }
 
     override fun onResume() {
         super.onResume()
@@ -207,11 +186,11 @@ class BarcodeScannerFragment : Fragment() {
                     it.setAnalyzer(
                         cameraExecutor,
                         QrCodeAnalyzer(
-                            this.requireContext(),
+                            this.requireActivity(),
                             barcodeBoxView,
                             binding.previewView.width.toFloat(),
                             binding.previewView.height.toFloat(),
-                            scannedBarcode
+                            scannedBarcode,
                         )
                     )
                 }
@@ -228,9 +207,43 @@ class BarcodeScannerFragment : Fragment() {
                     this, cameraSelector, preview, imageAnalyzer
                 )
 
+
             } catch (exc: Exception) {
                 exc.printStackTrace()
             }
         }, ContextCompat.getMainExecutor(this.requireContext()))
+    }
+
+    private fun returntoAddItem() {
+        // val action = BarcodeScannerFragmentDirections.actionBarcodeScannerFragmentToAddItemFragment(getString(R.string.add_fragment_title))
+        // findNavController().navigate(action)
+        requireActivity().onBackPressed()
+    }
+
+
+    @SuppressLint("ClickableViewAccessibility")
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        visible = true
+
+
+        dummyButton = binding.dummyButton
+        fullscreenContent = binding.fullscreenContent
+        fullscreenContentControls = binding.fullscreenContentControls
+        // Set up the user interaction to manually show or hide the system UI.
+
+
+        // Upon interacting with UI controls, delay any scheduled hide()
+        // operations to prevent the jarring behavior of controls going away
+        // while interacting with the UI.
+        binding.dummyButton.setOnClickListener {
+            returntoAddItem()
+        }
+        cameraExecutor = Executors.newSingleThreadExecutor()
+
+        barcodeBoxView = BarcodeBoxView(this.requireContext())
+
+        checkCameraPermission()
     }
 }

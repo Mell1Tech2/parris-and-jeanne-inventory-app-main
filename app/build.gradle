@@ -83,4 +83,7 @@ dependencies {
     implementation "androidx.camera:camera-camera2:$camerax_version"
     implementation "androidx.camera:camera-lifecycle:$camerax_version"
     implementation 'androidx.camera:camera-view:1.0.0-alpha31'
+
+    //Kotlin JS platform
+    implementation 'com.github.doyaaaaaken:kotlin-csv-jvm:1.2.0' //for JVM platform
 }
