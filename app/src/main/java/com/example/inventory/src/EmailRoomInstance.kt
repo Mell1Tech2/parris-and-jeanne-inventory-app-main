@@ -43,10 +43,10 @@ class EmailRoomInstance {
 
         csvWriter().open(csvFile, append = false) {
 
-            writeRow("Item Barcode", "Item Name", "Item Price", "Item Quantity")
+            writeRow("Item Barcode", "Item Name", "Item Price", "Item Quantity", "Item Notes")
             Log.d("Log", "Item List  $itemList")
             itemList?.forEach {
-                writeRow(it.itemBarcode, it.itemName, it.itemPrice, it.quantityInStock)
+                writeRow(it.itemBarcode, it.itemName, it.itemPrice, it.quantityInStock, it.itemNote)
             }
         }
         Log.d("Log", "Item List $csvFile")

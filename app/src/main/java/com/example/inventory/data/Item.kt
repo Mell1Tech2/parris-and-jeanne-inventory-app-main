@@ -35,6 +35,8 @@ data class Item(
     val itemPrice: Double,
     @ColumnInfo(name = "quantity")
     val quantityInStock: Int,
+    @ColumnInfo(name = "note")
+    val itemNote: String,
 )
 /**
  * Returns the passed in price in currency format.

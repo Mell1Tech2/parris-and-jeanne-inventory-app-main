@@ -52,7 +52,6 @@ class AddItemFragment : Fragment() {
      */
     private fun isEntryValid(): Boolean {
         return viewModel.isEntryValid(
-            binding.itemBarcode.text.toString(),
             binding.itemNameAdd.text.toString(),
             binding.itemPrice.text.toString(),
             binding.itemCount.text.toString(),
@@ -65,9 +64,11 @@ class AddItemFragment : Fragment() {
     private fun bind(item: Item) {
         val price = "%.2f".format(item.itemPrice)
         binding.apply {
+            itemBarcodeAdd.setText(item.itemBarcode, TextView.BufferType.SPANNABLE)
             itemNameAdd.setText(item.itemName, TextView.BufferType.SPANNABLE)
             itemPrice.setText(price, TextView.BufferType.SPANNABLE)
             itemCount.setText(item.quantityInStock.toString(), TextView.BufferType.SPANNABLE)
+            itemNoteAdd.setText(item.itemNote, TextView.BufferType.SPANNABLE)
             saveAction.setOnClickListener { updateItem() }
         }
     }
@@ -78,10 +79,11 @@ class AddItemFragment : Fragment() {
     private fun addNewItem() {
         if (isEntryValid()) {
             viewModel.addNewItem(
-                binding.itemBarcode.text.toString(),
+                binding.itemBarcodeAdd.text.toString(),
                 binding.itemNameAdd.text.toString(),
                 binding.itemPrice.text.toString(),
                 binding.itemCount.text.toString(),
+                binding.itemNoteAdd.text.toString(),
             )
             val action = AddItemFragmentDirections.actionAddItemFragmentToItemListFragment()
             findNavController().navigate(action)
@@ -100,10 +102,11 @@ class AddItemFragment : Fragment() {
         if (isEntryValid()) {
             viewModel.updateItem(
                 this.navigationArgs.itemId,
-                this.binding.itemBarcode.text.toString(),
+                this.binding.itemBarcodeAdd.text.toString(),
                 this.binding.itemNameAdd.text.toString(),
                 this.binding.itemPrice.text.toString(),
-                this.binding.itemCount.text.toString()
+                this.binding.itemCount.text.toString(),
+                this.binding.itemNoteAdd.text.toString()
             )
             val action = AddItemFragmentDirections.actionAddItemFragmentToItemListFragment()
             findNavController().navigate(action)
@@ -122,7 +125,7 @@ class AddItemFragment : Fragment() {
         val id = navigationArgs.itemId
 
         scannedBarcode.getBarcode().observe(viewLifecycleOwner, { barcode ->
-            binding.itemBarcode.setText(barcode.toString())
+            binding.itemBarcodeAdd.setText(barcode.toString())
         })
 
         if (id > 0) {

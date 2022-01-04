@@ -207,7 +207,6 @@ class BarcodeScannerFragment : Fragment() {
                     this, cameraSelector, preview, imageAnalyzer
                 )
 
-
             } catch (exc: Exception) {
                 exc.printStackTrace()
             }
