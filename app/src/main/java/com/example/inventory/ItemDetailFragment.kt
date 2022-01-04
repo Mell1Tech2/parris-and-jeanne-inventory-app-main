@@ -43,9 +43,11 @@ class ItemDetailFragment : Fragment() {
      */
     private fun bind(item: Item) {
         binding.apply {
+            itemBarcode.text = item.itemBarcode
             itemName.text = item.itemName
             itemPrice.text = item.getFormattedPrice()
             itemCount.text = item.quantityInStock.toString()
+            itemNote.text = item.itemNote
             sellItem.isEnabled = viewModel.isStockAvailable(item)
             sellItem.setOnClickListener { viewModel.sellItem(item) }
             deleteItem.setOnClickListener { showConfirmationDialog() }

@@ -49,9 +49,10 @@ class InventoryViewModel(private val itemDao: ItemDao) : ViewModel() {
         itemBarcode: String,
         itemName: String,
         itemPrice: String,
-        itemCount: String
+        itemCount: String,
+        itemNote: String
     ) {
-        val updatedItem = getUpdatedItemEntry(itemId, itemBarcode, itemName, itemPrice, itemCount)
+        val updatedItem = getUpdatedItemEntry(itemId, itemBarcode, itemName, itemPrice, itemCount, itemNote)
         updateItem(updatedItem)
     }
 
@@ -79,8 +80,8 @@ class InventoryViewModel(private val itemDao: ItemDao) : ViewModel() {
     /**
      * Inserts the new Item into database.
      */
-    fun addNewItem(itemBarcode: String, itemName: String, itemPrice: String, itemCount: String) {
-        val newItem = getNewItemEntry(itemBarcode, itemName, itemPrice, itemCount)
+    fun addNewItem(itemBarcode: String, itemName: String, itemPrice: String, itemCount: String, itemNote: String) {
+        val newItem = getNewItemEntry(itemBarcode, itemName, itemPrice, itemCount, itemNote)
         insertItem(newItem)
     }
 
@@ -112,8 +113,8 @@ class InventoryViewModel(private val itemDao: ItemDao) : ViewModel() {
     /**
      * Returns true if the EditTexts are not empty
      */
-    fun isEntryValid(itemBarcode: String, itemName: String, itemPrice: String, itemCount: String): Boolean {
-        if (itemBarcode.isBlank() || itemName.isBlank() || itemPrice.isBlank() || itemCount.isBlank()) {
+    fun isEntryValid(itemName: String, itemPrice: String, itemCount: String): Boolean {
+        if (itemName.isBlank() || itemPrice.isBlank() || itemCount.isBlank()) {
             return false
         }
         return true
@@ -123,12 +124,19 @@ class InventoryViewModel(private val itemDao: ItemDao) : ViewModel() {
      * Returns an instance of the [Item] entity class with the item info entered by the user.
      * This will be used to add a new entry to the Inventory database.
      */
-    private fun getNewItemEntry(itemBarcode: String, itemName: String, itemPrice: String, itemCount: String): Item {
+    private fun getNewItemEntry(
+        itemBarcode: String,
+        itemName: String,
+        itemPrice: String,
+        itemCount: String,
+        itemNote: String
+    ): Item {
         return Item(
             itemBarcode = itemBarcode,
             itemName = itemName,
             itemPrice = itemPrice.toDouble(),
-            quantityInStock = itemCount.toInt()
+            quantityInStock = itemCount.toInt(),
+            itemNote = itemNote
         )
     }
 
@@ -141,14 +149,16 @@ class InventoryViewModel(private val itemDao: ItemDao) : ViewModel() {
         itemBarcode: String,
         itemName: String,
         itemPrice: String,
-        itemCount: String
+        itemCount: String,
+        itemNote: String
     ): Item {
         return Item(
             id = itemId,
             itemBarcode = itemBarcode,
             itemName = itemName,
             itemPrice = itemPrice.toDouble(),
-            quantityInStock = itemCount.toInt()
+            quantityInStock = itemCount.toInt(),
+            itemNote = itemNote
         )
     }
 }

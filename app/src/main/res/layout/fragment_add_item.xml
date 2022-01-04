@@ -31,7 +31,7 @@
                 android:orientation="horizontal">
 
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/item_barcode"
+                    android:id="@+id/item_barcode_add"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:inputType="textAutoComplete|textCapWords"
@@ -94,7 +94,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/margin"
             android:hint="@string/quantity_req"
-            app:layout_constraintBottom_toTopOf="@+id/save_action"
+            app:layout_constraintBottom_toTopOf="@id/item_note_label"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/item_price_label">
@@ -107,6 +107,25 @@
                 android:singleLine="true" />
         </com.google.android.material.textfield.TextInputLayout>
 
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/item_note_label"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin"
+            android:hint="@string/notes"
+            app:layout_constraintBottom_toTopOf="@+id/save_action"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/item_count_label">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/item_note_add"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:inputType="textAutoComplete|textCapWords"
+                android:singleLine="true" />
+        </com.google.android.material.textfield.TextInputLayout>
+
         <Button
             android:id="@+id/save_action"
             android:layout_width="0dp"
@@ -115,7 +134,7 @@
             android:text="@string/save_action"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/item_count_label" />
+            app:layout_constraintTop_toBottomOf="@id/item_note_label" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>
