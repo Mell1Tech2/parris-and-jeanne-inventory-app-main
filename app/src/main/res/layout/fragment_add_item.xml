@@ -12,12 +12,12 @@
         android:layout_margin="@dimen/margin">
 
         <LinearLayout
-            android:id="@+id/linearLayout"
+            android:id="@+id/item_barcode_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginBottom="16dp"
             android:orientation="horizontal"
-            app:layout_constraintBottom_toTopOf="@id/item_name_label"
+            app:layout_constraintBottom_toTopOf="@id/item_name_layout"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
@@ -48,25 +48,42 @@
 
         </LinearLayout>
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/item_name_label"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/margin"
-            android:hint="@string/item_name_req"
+        <LinearLayout
+            android:id="@+id/item_name_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="16dp"
+            android:orientation="horizontal"
             app:layout_constraintBottom_toTopOf="@id/item_price_label"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/linearLayout">
+            app:layout_constraintTop_toBottomOf="@id/item_price_label">
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/item_name_add"
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/item_name_label"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:inputType="textAutoComplete|textCapWords"
-                android:singleLine="true" />
+                android:layout_weight="1"
+                android:hint="@string/item_name_req"
+                android:orientation="horizontal">
 
-        </com.google.android.material.textfield.TextInputLayout>
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/item_name_add"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:inputType="textAutoComplete|textCapWords"
+                    android:singleLine="true" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <Button
+                android:id="@+id/scan_name"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="2"
+                android:text="@string/scan" />
+
+        </LinearLayout>
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/item_price_label"
@@ -77,7 +94,7 @@
             app:layout_constraintBottom_toTopOf="@id/item_count_label"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/item_name_label"
+            app:layout_constraintTop_toBottomOf="@id/item_name_layout"
             app:prefixText="@string/currency_symbol">
 
             <com.google.android.material.textfield.TextInputEditText

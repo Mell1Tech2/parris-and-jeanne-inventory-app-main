@@ -32,7 +32,7 @@
     <fragment
         android:id="@+id/addItemFragment"
         android:name="com.example.inventory.AddItemFragment"
-        android:label="{title}"
+        android:label="@string/add_fragment_title"
         tools:layout="@layout/fragment_add_item">
         <argument
             android:name="title"
@@ -47,18 +47,18 @@
             app:popUpTo="@id/itemListFragment"
             app:popUpToInclusive="true" />
         <action
-            android:id="@+id/action_addItemFragment_to_barcodeScannerFragment"
-            app:destination="@id/barcodeScannerFragment"
-            app:popUpTo="@id/barcodeScannerFragment"
+            android:id="@+id/action_addItemFragment_to_cameraScannerFragment"
+            app:destination="@id/cameraScannerFragment"
+            app:popUpTo="@id/cameraScannerFragment"
             app:popUpToInclusive="true" />
     </fragment>
     <fragment
-        android:id="@+id/barcodeScannerFragment"
-        android:name="com.example.inventory.BarcodeScannerFragment"
-        android:label="fragment_barcode_scanner"
-        tools:layout="@layout/fragment_barcode_scanner" >
+        android:id="@+id/cameraScannerFragment"
+        android:name="com.example.inventory.CameraScannerFragment"
+        android:label="fragment_camera_scanner"
+        tools:layout="@layout/fragment_camera_scanner" >
         <action
-            android:id="@+id/action_barcodeScannerFragment_to_addItemFragment"
+            android:id="@+id/action_cameraScannerFragment_to_addItemFragment"
             app:destination="@id/addItemFragment"
             app:popUpTo="@id/addItemFragment" />
     </fragment>

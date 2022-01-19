@@ -12,7 +12,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.example.inventory.data.Item
-import com.example.inventory.data.ScannedBarcodes
+import com.example.inventory.data.SessionAddItem
 import com.example.inventory.databinding.FragmentAddItemBinding
 
 /**
@@ -26,15 +26,9 @@ class AddItemFragment : Fragment() {
                 .itemDao()
         )
     }
-
     private val navigationArgs: ItemDetailFragmentArgs by navArgs()
-    private val scannedBarcode: ScannedBarcodes by activityViewModels()
-
+    private val sessionAddItem: SessionAddItem by activityViewModels()
     lateinit var item: Item
-
-    // Binding object instance corresponding to the fragment_add_item.xml layout
-    // This property is non-null between the onCreateView() and onDestroyView() lifecycle callbacks,
-    // when the view hierarchy is attached to the fragment
     private var _binding: FragmentAddItemBinding? = null
     private val binding get() = _binding!!
 
@@ -70,6 +64,8 @@ class AddItemFragment : Fragment() {
             itemCount.setText(item.quantityInStock.toString(), TextView.BufferType.SPANNABLE)
             itemNoteAdd.setText(item.itemNote, TextView.BufferType.SPANNABLE)
             saveAction.setOnClickListener { updateItem() }
+
+
         }
     }
 
@@ -85,19 +81,26 @@ class AddItemFragment : Fragment() {
                 binding.itemCount.text.toString(),
                 binding.itemNoteAdd.text.toString(),
             )
+            sessionAddItem.setBarcode("")
+            sessionAddItem.setName("")
             val action = AddItemFragmentDirections.actionAddItemFragmentToItemListFragment()
             findNavController().navigate(action)
         }
     }
 
     private fun scanBarcode() {
-        val action = AddItemFragmentDirections.actionAddItemFragmentToBarcodeScannerFragment()
+        sessionAddItem.setState("barcode")
+        val action = AddItemFragmentDirections.actionAddItemFragmentToCameraScannerFragment()
         findNavController().navigate(action)
     }
 
-    /**
-     * Updates an existing Item in the database and navigates up to list fragment.
-     */
+    private fun scanName() {
+        sessionAddItem.setState("readText")
+        val action = AddItemFragmentDirections.actionAddItemFragmentToCameraScannerFragment()
+        findNavController().navigate(action)
+    }
+
+
     private fun updateItem() {
         if (isEntryValid()) {
             viewModel.updateItem(
@@ -108,24 +111,28 @@ class AddItemFragment : Fragment() {
                 this.binding.itemCount.text.toString(),
                 this.binding.itemNoteAdd.text.toString()
             )
+            sessionAddItem.setBarcode("")
+            sessionAddItem.setName("")
             val action = AddItemFragmentDirections.actionAddItemFragmentToItemListFragment()
             findNavController().navigate(action)
         }
     }
 
-    /**
-     * Called when the view is created.
-     * The itemId Navigation argument determines the edit item  or add new item.
-     * If the itemId is positive, this method retrieves the information from the database and
-     * allows the user to update it.
-     */
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         val id = navigationArgs.itemId
+        binding.apply {
+            if (itemCount.text.toString() == "") {
+                itemCount.setText("1", TextView.BufferType.SPANNABLE)
+            }
+        }
 
-        scannedBarcode.getBarcode().observe(viewLifecycleOwner, { barcode ->
+        sessionAddItem.getBarcode().observe(viewLifecycleOwner, { barcode ->
             binding.itemBarcodeAdd.setText(barcode.toString())
+        })
+        sessionAddItem.getName().observe(viewLifecycleOwner, { name ->
+            binding.itemNameAdd.setText(name.toString())
         })
 
         if (id > 0) {
@@ -137,15 +144,15 @@ class AddItemFragment : Fragment() {
             binding.scanBarcode.setOnClickListener {
                 scanBarcode()
             }
+            binding.scanName.setOnClickListener {
+                scanName()
+            }
             binding.saveAction.setOnClickListener {
                 addNewItem()
             }
         }
     }
 
-    /**
-     * Called before fragment is destroyed.
-     */
     override fun onDestroyView() {
         super.onDestroyView()
         // Hide keyboard.

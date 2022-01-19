@@ -5,58 +5,36 @@ import android.annotation.SuppressLint
 import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.os.Bundle
 import android.util.Log
+import android.util.Rational
+import android.util.Size
 import android.view.LayoutInflater
+import android.view.Surface.ROTATION_0
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.Button
-import androidx.camera.core.CameraSelector
-import androidx.camera.core.ImageAnalysis
-import androidx.camera.core.Preview
+import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.PermissionChecker
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.navigation.fragment.findNavController
-import com.example.inventory.barcode.QrCodeAnalyzer
-import com.example.inventory.data.ScannedBarcodes
-import com.example.inventory.databinding.FragmentBarcodeScannerBinding
-import com.example.inventory.view.BarcodeBoxView
+import com.example.inventory.barcode.ImageAnalyzer
+import com.example.inventory.data.SessionAddItem
+import com.example.inventory.databinding.FragmentCameraScannerBinding
+import com.example.inventory.shapedrawable.DrawBoxView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
-class BarcodeScannerFragment : Fragment() {
+class CameraScannerFragment : Fragment() {
 
-    private val scannedBarcode: ScannedBarcodes by activityViewModels()
-
-    private val showPart2Runnable = Runnable {
-        // Delayed display of UI elements
-        fullscreenContentControls?.visibility = View.VISIBLE
-    }
-    private var visible: Boolean = false
-
-    /**
-     * Touch listener to use for in-layout UI controls to delay hiding the
-     * system UI. This is to prevent the jarring behavior of controls going away
-     * while interacting with activity UI.
-     */
-    @SuppressLint("ClickableViewAccessibility")
-    private val delayHideTouchListener = View.OnTouchListener { _, _ ->
-        false
-    }
-
+    private val sessionAddItem: SessionAddItem by activityViewModels()
     private lateinit var cameraExecutor: ExecutorService
-    private lateinit var barcodeBoxView: BarcodeBoxView
-
-
+    private lateinit var drawBoxView: DrawBoxView
     private var dummyButton: Button? = null
-    private var fullscreenContent: View? = null
-    private var fullscreenContentControls: View? = null
-
-    private var _binding: FragmentBarcodeScannerBinding? = null
+    private var _binding: FragmentCameraScannerBinding? = null
     private val binding get() = _binding!!
 
     override fun onCreateView(
@@ -64,11 +42,9 @@ class BarcodeScannerFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentBarcodeScannerBinding.inflate(inflater, container, false)
+        _binding = FragmentCameraScannerBinding.inflate(inflater, container, false)
         return binding.root
     }
-
-
 
     override fun onResume() {
         super.onResume()
@@ -83,28 +59,6 @@ class BarcodeScannerFragment : Fragment() {
     override fun onDestroy() {
         super.onDestroy()
         dummyButton = null
-        fullscreenContent = null
-        fullscreenContentControls = null
-    }
-
-    companion object {
-        /**
-         * Whether or not the system UI should be auto-hidden after
-         * [AUTO_HIDE_DELAY_MILLIS] milliseconds.
-         */
-        private const val AUTO_HIDE = true
-
-        /**
-         * If [AUTO_HIDE] is set, the number of milliseconds to wait after
-         * user interaction before hiding the system UI.
-         */
-        private const val AUTO_HIDE_DELAY_MILLIS = 3000
-
-        /**
-         * Some older devices needs a small delay between UI widget updates
-         * and a change of the status and navigation bar.
-         */
-        private const val UI_ANIMATION_DELAY = 300
     }
 
     override fun onDestroyView() {
@@ -120,6 +74,7 @@ class BarcodeScannerFragment : Fragment() {
     ) {
         checkIfCameraPermissionIsGranted()
     }
+
 
     /**
      * This function is responsible to request the required CAMERA permission
@@ -166,6 +121,7 @@ class BarcodeScannerFragment : Fragment() {
     /**
      * This function is responsible for the setup of the camera preview and the image analyzer.
      */
+    @SuppressLint("UnsafeOptInUsageError")
     private fun startCamera() {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(this.requireContext())
 
@@ -180,23 +136,38 @@ class BarcodeScannerFragment : Fragment() {
 
             // Image analyzer
             val imageAnalyzer = ImageAnalysis.Builder()
+                .setTargetResolution(Size(480, 640))
                 .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+                .setImageQueueDepth(1)
                 .build()
                 .also {
                     it.setAnalyzer(
                         cameraExecutor,
-                        QrCodeAnalyzer(
+                        ImageAnalyzer(
                             this.requireActivity(),
-                            barcodeBoxView,
+                            this,
+                            drawBoxView,
                             binding.previewView.width.toFloat(),
                             binding.previewView.height.toFloat(),
-                            scannedBarcode,
+                            sessionAddItem,
                         )
+
                     )
                 }
 
+            //val imageCapture = ImageCapture.Builder().build()
+
+            val viewPort =  ViewPort.Builder(Rational(560, 480), ROTATION_0).build()
+            val useCaseGroup = UseCaseGroup.Builder()
+                .addUseCase(preview)
+                .addUseCase(imageAnalyzer)
+                //.addUseCase(imageCapture)
+                .setViewPort(viewPort)
+                .build()
             // Select back camera as a default
             val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
+
+
 
             try {
                 // Unbind use cases before rebinding
@@ -204,7 +175,7 @@ class BarcodeScannerFragment : Fragment() {
 
                 // Bind use cases to camera
                 cameraProvider.bindToLifecycle(
-                    this, cameraSelector, preview, imageAnalyzer
+                    this, cameraSelector, useCaseGroup
                 )
 
             } catch (exc: Exception) {
@@ -219,30 +190,15 @@ class BarcodeScannerFragment : Fragment() {
         requireActivity().onBackPressed()
     }
 
-
     @SuppressLint("ClickableViewAccessibility")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        visible = true
-
-
         dummyButton = binding.dummyButton
-        fullscreenContent = binding.fullscreenContent
-        fullscreenContentControls = binding.fullscreenContentControls
-        // Set up the user interaction to manually show or hide the system UI.
-
-
-        // Upon interacting with UI controls, delay any scheduled hide()
-        // operations to prevent the jarring behavior of controls going away
-        // while interacting with the UI.
         binding.dummyButton.setOnClickListener {
             returntoAddItem()
         }
         cameraExecutor = Executors.newSingleThreadExecutor()
-
-        barcodeBoxView = BarcodeBoxView(this.requireContext())
-
+        drawBoxView = binding.DrawBoxViewBind
         checkCameraPermission()
     }
 }
