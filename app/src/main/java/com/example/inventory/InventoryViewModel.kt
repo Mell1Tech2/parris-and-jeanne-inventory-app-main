@@ -102,6 +102,14 @@ class InventoryViewModel(private val itemDao: ItemDao) : ViewModel() {
             itemDao.delete(item)
         }
     }
+    fun deleteAllItems() {
+        viewModelScope.launch {
+            //val item
+            for (item in allItems.value!!){
+                itemDao.delete(item)
+            }
+        }
+    }
 
     /**
      * Retrieve an item from the repository.
