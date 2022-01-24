@@ -15,9 +15,14 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface ItemDao {
 
+    // Get all items
     @Query("SELECT * from item ORDER BY name ASC")
     fun getItems(): Flow<List<Item>>
 
+    @Query("SELECT * from item ORDER BY name ASC")
+    fun getItemsJson(): Flow<Array<Item>>
+
+    // Get a single item
     @Query("SELECT * from item WHERE id = :id")
     fun getItem(id: Int): Flow<Item>
 
