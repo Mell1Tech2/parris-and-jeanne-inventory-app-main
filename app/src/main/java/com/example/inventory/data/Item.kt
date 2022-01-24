@@ -18,6 +18,7 @@ package com.example.inventory.data
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.google.firebase.database.Exclude
 import java.text.NumberFormat
 
 /**
@@ -37,7 +38,17 @@ data class Item(
     val quantityInStock: Int,
     @ColumnInfo(name = "note")
     val itemNote: String,
-)
+) {
+    fun changetoMap(): Map<String, Any?> {
+        return mapOf(
+            "barcode" to itemBarcode,
+            "name" to itemName,
+            "price" to itemPrice,
+            "quantity" to quantityInStock,
+            "note" to itemNote,
+        )
+    }
+}
 /**
  * Returns the passed in price in currency format.
  */

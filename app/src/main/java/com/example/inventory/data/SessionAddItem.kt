@@ -20,31 +20,31 @@ class SessionAddItem: ViewModel(){
 
     fun setState(item: String) {
         state.value = item
-        Log.d("Log", "Set barcode: " + state.value as String)
+        //Log.d("Log", "Set state: " + state.value as String)
     }
 
     fun getState(): LiveData<String> {
-        Log.d("Log", "Get barcode: " + state.value as String)
+        //Log.d("Log", "Get state: " + state.value as String)
         return state
     }
 
     fun setBarcode(item: String) {
         barcodeLiveData.value = item
-        Log.d("Log", "Set barcode: " + barcodeLiveData.value as String)
+        //Log.d("Log", "Set barcode: " + barcodeLiveData.value as String)
     }
 
     fun getBarcode(): LiveData<String> {
-        Log.d("Log", "Get barcode: " + barcodeLiveData.value as String)
+        //Log.d("Log", "Get barcode: " + barcodeLiveData.value as String)
         return barcodeLiveData
     }
 
     fun setName(item: String) {
         readTextLiveData.value = item
-        Log.d("Log", "Set barcode: " + readTextLiveData.value as String)
+        //Log.d("Log", "Set name: " + readTextLiveData.value as String)
     }
 
     fun getName(): LiveData<String> {
-        Log.d("Log", "Get barcode: " + readTextLiveData.value as String)
+        //Log.d("Log", "Get name: " + readTextLiveData.value as String)
         return readTextLiveData
     }
 

@@ -64,8 +64,6 @@ class AddItemFragment : Fragment() {
             itemCount.setText(item.quantityInStock.toString(), TextView.BufferType.SPANNABLE)
             itemNoteAdd.setText(item.itemNote, TextView.BufferType.SPANNABLE)
             saveAction.setOnClickListener { updateItem() }
-
-
         }
     }
 
